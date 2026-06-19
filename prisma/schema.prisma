@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,8 +5,6 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-
-// ─── Telemetry ───────────────────────────────────────────────────────────────
 
 model TelemetryReading {
   id           Int      @id @default(autoincrement())
@@ -22,8 +17,6 @@ model TelemetryReading {
   @@index([createdAt])
 }
 
-// ─── Feed ────────────────────────────────────────────────────────────────────
-
 model FeedReading {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -35,12 +28,6 @@ model FeedReading {
   @@index([date])
 }
 
-enum FeedSlot {
-  MORNING
-  AFTERNOON
-  NIGHT
-}
-
 model DailyFeedSummary {
   id             Int      @id @default(autoincrement())
   date           DateTime @unique
@@ -49,8 +36,6 @@ model DailyFeedSummary {
 
   @@index([date])
 }
-
-// ─── Alerts ──────────────────────────────────────────────────────────────────
 
 model Alert {
   id          Int           @id @default(autoincrement())
@@ -61,6 +46,18 @@ model Alert {
   resolved    Boolean       @default(false)
 
   @@index([createdAt])
+}
+
+model DailyAISummary {
+  id      Int      @id @default(autoincrement())
+  date    DateTime @unique
+  summary String
+}
+
+enum FeedSlot {
+  MORNING
+  AFTERNOON
+  NIGHT
 }
 
 enum AlertType {
@@ -75,12 +72,4 @@ enum AlertSeverity {
   WARNING
   CRITICAL
   EMERGENCY
-}
-
-// ─── Daily Summary ───────────────────────────────────────────────────────────
-
-model DailyAISummary {
-  id        Int      @id @default(autoincrement())
-  date      DateTime @unique
-  summary   String
 }

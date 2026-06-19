@@ -1,35 +1,26 @@
-FROM node:20-alpine AS builder
+FROM node:22-alpine
 
 WORKDIR /app
 
+# Install dependencies
 COPY package*.json ./
 RUN npm ci
 
+# Copy all source files
 COPY . .
 
-# Provide a dummy DATABASE_URL so prisma generate can load prisma.config.ts
-# (prisma generate only creates TypeScript types — it never connects to the DB)
+# Provide a dummy URL so prisma.config.ts loads without error
+# (prisma generate only generates TypeScript types — never connects to DB)
 ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 
+# Generate Prisma client types
 RUN npx prisma generate
+
+# Compile TypeScript → dist/
 RUN npm run build
-
-# ─── Production stage ────────────────────────────────────────────────────────
-
-FROM node:20-alpine AS production
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --omit=dev
-
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY prisma ./prisma
-COPY prisma.config.ts ./prisma.config.ts
 
 EXPOSE 3000
 
-# At runtime, DATABASE_URL is injected by Railway's PostgreSQL plugin
+# At runtime: real DATABASE_URL is injected by Railway PostgreSQL plugin
+# Run migrations first, then start the server
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]

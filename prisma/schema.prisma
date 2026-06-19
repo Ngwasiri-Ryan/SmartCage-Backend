@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Telemetry ───────────────────────────────────────────────────────────────
+
+model TelemetryReading {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  temperature  Float
+  ammonia      Float
+  fanActive    Boolean  @default(false)
+  heaterActive Boolean  @default(false)
+
+  @@index([createdAt])
+}
+
+// ─── Feed ────────────────────────────────────────────────────────────────────
+
+model FeedReading {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  slot      FeedSlot
+  weightKg  Float
+  date      DateTime
+
+  @@unique([slot, date])
+  @@index([date])
+}
+
+enum FeedSlot {
+  MORNING
+  AFTERNOON
+  NIGHT
+}
+
+model DailyFeedSummary {
+  id             Int      @id @default(autoincrement())
+  date           DateTime @unique
+  totalKg        Float
+  isDeclineTrend Boolean  @default(false)
+
+  @@index([date])
+}
+
+// ─── Alerts ──────────────────────────────────────────────────────────────────
+
+model Alert {
+  id          Int           @id @default(autoincrement())
+  createdAt   DateTime      @default(now())
+  type        AlertType
+  severity    AlertSeverity
+  description String
+  resolved    Boolean       @default(false)
+
+  @@index([createdAt])
+}
+
+enum AlertType {
+  TEMPERATURE
+  AMMONIA
+  FEED
+  COMBINED
+}
+
+enum AlertSeverity {
+  CAUTION
+  WARNING
+  CRITICAL
+  EMERGENCY
+}
+
+// ─── Daily Summary ───────────────────────────────────────────────────────────
+
+model DailyAISummary {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @unique
+  summary   String
+}

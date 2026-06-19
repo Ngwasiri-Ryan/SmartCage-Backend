@@ -23,4 +23,4 @@ EXPOSE 3000
 
 # At runtime: real DATABASE_URL is injected by Railway PostgreSQL plugin
 # Run migrations first, then start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]

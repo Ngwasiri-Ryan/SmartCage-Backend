@@ -11,6 +11,7 @@ model TelemetryReading {
   createdAt    DateTime @default(now())
   temperature  Float
   ammonia      Float
+  feedWeight   Float    @default(0.0)
   fanActive    Boolean  @default(false)
   heaterActive Boolean  @default(false)
 

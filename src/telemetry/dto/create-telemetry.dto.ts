@@ -11,6 +11,11 @@ export class CreateTelemetryDto {
   @Max(500)
   ammonia: number;
 
+  @IsNumber()
+  @Min(0)
+  @Max(1000)
+  feedWeight: number;
+
   @IsBoolean()
   fanActive: boolean;
 

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "TelemetryReading" ADD COLUMN "feedWeight" DOUBLE PRECISION NOT NULL DEFAULT 0.0;

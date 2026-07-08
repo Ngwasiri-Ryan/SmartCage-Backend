@@ -33,6 +33,9 @@ class FaceRegisterRequest(BaseModel):
   angle: str
   imagePath: str
 
+class FaceValidateRequest(BaseModel):
+  imagePath: str
+
 class StartStreamRequest(BaseModel):
   cameraId: int
   rtspUrl: str
@@ -53,6 +56,20 @@ def register_face(req: FaceRegisterRequest):
   try:
     embedding = recognizer.get_embedding(local_path)
     return {"status": "ok", "embedding": embedding}
+  except Exception as e:
+    raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/validate-face")
+def validate_face(req: FaceValidateRequest):
+  local_path = os.path.join(BACKEND_DIR, req.imagePath.lstrip('/'))
+  print(f"[AI Service] Validating face image path: {local_path}")
+  
+  if not os.path.exists(local_path):
+    raise HTTPException(status_code=404, detail=f"Image file not found at: {local_path}")
+    
+  try:
+    res = recognizer.validate_face(local_path)
+    return res
   except Exception as e:
     raise HTTPException(status_code=400, detail=str(e))
 

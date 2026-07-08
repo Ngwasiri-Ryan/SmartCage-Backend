@@ -16,6 +16,30 @@ class FaceRecognizer:
     # Initialize InceptionResnetV1 for face embedding extraction
     self.resnet = InceptionResnetV1(pretrained='vggface2').eval().to(self.device)
 
+  def validate_face(self, image_path: str):
+    """
+    Validate if the image contains exactly one face.
+    Returns: {"status": "ok", "embedding": list} or {"status": "error", "error": "no_face_detected"|"multiple_faces_detected"}
+    """
+    if not os.path.exists(image_path):
+      raise FileNotFoundError(f"Image not found at path: {image_path}")
+
+    img = Image.open(image_path).convert('RGB')
+    
+    # Detect face count
+    boxes, _ = self.mtcnn.detect(img)
+    if boxes is None or len(boxes) == 0:
+      return {"status": "error", "error": "no_face_detected"}
+    elif len(boxes) > 1:
+      return {"status": "error", "error": "multiple_faces_detected"}
+      
+    # Generate embedding
+    try:
+      embedding = self.get_embedding(image_path)
+      return {"status": "ok", "embedding": embedding}
+    except Exception as e:
+      return {"status": "error", "error": str(e)}
+
   def get_embedding(self, image_path: str):
     """
     Load image, detect face using MTCNN, and extract 512-dim embedding.

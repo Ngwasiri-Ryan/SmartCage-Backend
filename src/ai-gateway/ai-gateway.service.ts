@@ -49,4 +49,21 @@ export class AIGatewayService {
       throw e;
     }
   }
+
+  async validateFace(imagePath: string): Promise<{ status: string; embedding?: number[]; error?: string }> {
+    try {
+      const response = await fetch(`${this.aiServiceUrl}/validate-face`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imagePath }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return await response.json();
+    } catch (e) {
+      console.error(`[AIGateway] Face validation request failed:`, e.message);
+      return { status: 'error', error: e.message };
+    }
+  }
 }

@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Param, Body, UploadedFile, UseInterceptors, ParseIntPipe } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Post, Param, Body, UploadedFiles, UseInterceptors, ParseIntPipe } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { PersonnelService } from './personnel.service';
 
 @Controller('personnel')
@@ -7,8 +7,24 @@ export class PersonnelController {
   constructor(private readonly personnelService: PersonnelService) {}
 
   @Post()
-  create(@Body() body: { name: string; role: string }) {
-    return this.personnelService.create(body);
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'front', maxCount: 1 },
+      { name: 'left', maxCount: 1 },
+      { name: 'right', maxCount: 1 },
+    ]),
+  )
+  create(
+    @Body() body: { name: string; role: string },
+    @UploadedFiles() files: { front?: any[]; left?: any[]; right?: any[] },
+  ) {
+    return this.personnelService.registerWithFaces(
+      body.name,
+      body.role,
+      files.front?.[0],
+      files.left?.[0],
+      files.right?.[0],
+    );
   }
 
   @Get()
@@ -19,15 +35,5 @@ export class PersonnelController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.personnelService.findOne(id);
-  }
-
-  @Post(':id/face')
-  @UseInterceptors(FileInterceptor('file'))
-  addFace(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('angle') angle: string,
-    @UploadedFile() file: any,
-  ) {
-    return this.personnelService.addFace(id, angle, file);
   }
 }

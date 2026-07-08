@@ -36,6 +36,26 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     return this.client.dailyAISummary;
   }
 
+  get camera() {
+    return this.client.camera;
+  }
+
+  get personnel() {
+    return this.client.personnel;
+  }
+
+  get faceData() {
+    return this.client.faceData;
+  }
+
+  get healthAlert() {
+    return this.client.healthAlert;
+  }
+
+  get accessLog() {
+    return this.client.accessLog;
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   async onModuleInit() {

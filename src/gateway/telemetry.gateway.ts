@@ -47,6 +47,14 @@ export class TelemetryGateway
     this.server.emit('alert:new', data);
   }
 
+  emitHealthAlert(data: object) {
+    this.server.emit('health-alert:new', data);
+  }
+
+  emitAccessLog(data: object) {
+    this.server.emit('access-log:new', data);
+  }
+
   emitRelayChange(data: { fanActive: boolean; heaterActive: boolean }) {
     this.server.emit('relay:change', {
       ...data,

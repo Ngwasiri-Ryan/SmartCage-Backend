@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Enable static asset serving for uploads (snapshots, face images)
+  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
   // Enable global DTO validation
   app.useGlobalPipes(

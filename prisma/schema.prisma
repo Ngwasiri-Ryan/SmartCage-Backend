@@ -74,3 +74,57 @@ enum AlertSeverity {
   CRITICAL
   EMERGENCY
 }
+
+model Camera {
+  id           Int           @id @default(autoincrement())
+  name         String
+  rtspUrl      String
+  zone         String
+  active       Boolean       @default(true)
+  healthAlerts HealthAlert[]
+  accessLogs   AccessLog[]
+}
+
+model Personnel {
+  id         Int         @id @default(autoincrement())
+  name       String
+  role       String
+  active     Boolean     @default(true)
+  faces      FaceData[]
+  accessLogs AccessLog[]
+}
+
+model FaceData {
+  id          Int       @id @default(autoincrement())
+  personnelId Int
+  personnel   Personnel @relation(fields: [personnelId], references: [id], onDelete: Cascade)
+  angle       String    // "FRONT", "LEFT", "RIGHT"
+  imagePath   String
+  embedding   Float[]
+}
+
+model HealthAlert {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  cameraId      Int
+  camera        Camera   @relation(fields: [cameraId], references: [id], onDelete: Cascade)
+  movementScore Float
+  description   String
+  snapshotPath  String?
+
+  @@index([createdAt])
+}
+
+model AccessLog {
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  personnelId  Int?
+  personnel    Personnel? @relation(fields: [personnelId], references: [id], onDelete: SetNull)
+  cameraId     Int
+  camera       Camera     @relation(fields: [cameraId], references: [id], onDelete: Cascade)
+  isAuthorized Boolean
+  matchedName  String
+  snapshotPath String?
+
+  @@index([createdAt])
+}

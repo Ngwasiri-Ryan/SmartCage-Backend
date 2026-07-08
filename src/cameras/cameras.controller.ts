@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { CamerasService } from './cameras.service';
 
 @Controller('cameras')
@@ -18,6 +18,14 @@ export class CamerasController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.camerasService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { name?: string; rtspUrl?: string; zone?: string; active?: boolean },
+  ) {
+    return this.camerasService.update(id, body);
   }
 
   @Delete(':id')

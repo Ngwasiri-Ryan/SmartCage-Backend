@@ -39,6 +39,35 @@ export class CamerasService {
     return camera;
   }
 
+  async update(id: number, data: { name?: string; rtspUrl?: string; zone?: string; active?: boolean }) {
+    await this.findOne(id);
+    const camera = await this.prisma.camera.update({
+      where: { id },
+      data,
+    });
+
+    if (data.active !== undefined) {
+      try {
+        if (data.active) {
+          await this.aiGateway.startStream(camera.id, camera.rtspUrl);
+        } else {
+          await this.aiGateway.stopStream(camera.id);
+        }
+      } catch (e) {
+        console.warn(`[CamerasService] AI stream toggle failed: ${e.message}`);
+      }
+    } else if (data.rtspUrl && camera.active) {
+      try {
+        await this.aiGateway.stopStream(camera.id);
+        await this.aiGateway.startStream(camera.id, camera.rtspUrl);
+      } catch (e) {
+        console.warn(`[CamerasService] AI stream restart failed: ${e.message}`);
+      }
+    }
+
+    return camera;
+  }
+
   async delete(id: number) {
     // Notify AI service to stop stream
     try {

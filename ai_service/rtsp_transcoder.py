@@ -31,7 +31,6 @@ class RTSPTranscoder:
     # FFmpeg command to transcode video copy without re-encoding to minimize CPU utilization
     cmd = [
       ffmpeg_path,
-      '-rtsp_transport', 'tcp',
       '-i', rtsp_url,
       '-c:v', 'copy',
       '-an',
@@ -42,18 +41,20 @@ class RTSPTranscoder:
     ]
 
     print(f"[RTSPTranscoder] Launching FFmpeg for Camera #{camera_id}")
+    print(f"[RTSPTranscoder] Command: {' '.join(cmd)}")
     
     try:
-      # Spawn FFmpeg in background
-      devnull = open(os.devnull, 'w')
+      # Spawn FFmpeg in background, logging stdout/stderr to disk for troubleshooting
+      ffmpeg_log_path = os.path.join(stream_dir, 'ffmpeg.log')
+      ffmpeg_log = open(ffmpeg_log_path, 'w')
       
       # Use CREATE_NEW_PROCESS_GROUP on Windows to prevent signals from propagation
       creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
       
       process = subprocess.Popen(
         cmd,
-        stdout=devnull,
-        stderr=devnull,
+        stdout=ffmpeg_log,
+        stderr=ffmpeg_log,
         creationflags=creation_flags
       )
       self.processes[camera_id] = process

@@ -13,7 +13,7 @@ app = FastAPI(title="SmartCage AI Service")
 
 # Resolve absolute path to root directory
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BACKEND_DIR = os.path.join(ROOT_DIR, 'backend')
+BACKEND_DIR = ROOT_DIR
 NESTJS_API_URL = process_env_api_url = os.environ.get("NESTJS_API_URL", "http://localhost:3000")
 
 # Initialize models and utilities

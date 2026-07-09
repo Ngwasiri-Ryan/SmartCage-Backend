@@ -25,9 +25,12 @@ class RTSPTranscoder:
           except:
             pass
 
+    local_ffmpeg = os.path.join(os.path.dirname(__file__), 'ffmpeg.exe')
+    ffmpeg_path = local_ffmpeg if os.path.exists(local_ffmpeg) else 'ffmpeg'
+
     # FFmpeg command to transcode video copy without re-encoding to minimize CPU utilization
     cmd = [
-      'ffmpeg',
+      ffmpeg_path,
       '-rtsp_transport', 'tcp',
       '-i', rtsp_url,
       '-c:v', 'copy',
